@@ -1,5 +1,5 @@
 from agent.agent import Agent
 
 agent = Agent()
-result = agent.chat("Check my emails for anything I have missed.")
+result = agent.chat(input("What can I do for you today? \n"))
 print(result)
