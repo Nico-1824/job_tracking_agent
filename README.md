@@ -6,27 +6,21 @@ This agent will read your gmail emails from the last 2 weeks, it'll look for ema
 <h2>Setup</h2>
 <ol>
     <li>
-    First we must get the requirements to use the agent.
-    <code>
-    pip install -r requirements.txt
-    </code>
+    First we must get the requirements to use the agent.<br>
+    <code>pip install -r requirements.txt</code>
     </li>
     <li>
-    Then we can simply call the function
-    <code>
-    python main.py
-    </code>
+    Then we can simply call the function<br>
+    <code>python main.py</code>
     </li>
     <li>
-    When prompted you will need to give the agent a prompt to initiate the interaction such as:
-    <code>
-    Check my email for any updates.
-    </code>
+    When prompted you will need to give the agent a prompt to initiate the interaction such as:<br>
+    <code>Check my email for any updates.</code>
     </li>
 </ol>
 
 <h2>Future Plans</h2>
-- Integrate Docker to make setup more straightforward
-- Setup email summaries to be sent to a configed email summarizing what was found and what actions were done
-- Adding follow-up email recommendations
-- Checking sent emails for extra information
+- Integrate Docker to make setup more straightforward<br>
+- Setup email summaries to be sent to a configed email summarizing what was found and what actions were done<br>
+- Adding follow-up email recommendations<br>
+- Checking sent emails for extra information<br>
