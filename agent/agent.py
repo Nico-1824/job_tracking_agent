@@ -11,7 +11,7 @@ class Agent:
     def __init__(self):
         self.client = genai.Client(api_key=os.getenv("GEMINI_API"))
         self.tools = [_get_schema(), *_get_schema_spreadsheet()]
-        self.max_turns = 20
+        self.max_turns = 10
         self.companies = get_companies()
         self.TOOL_REGISTRY = {
             "get_messages": get_message_content,
