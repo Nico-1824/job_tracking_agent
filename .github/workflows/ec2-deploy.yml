@@ -25,5 +25,5 @@ jobs:
               sudo systemctl enable --now docker
               sudo usermod -aG docker $USER
             fi
-            docker pull ${{ secrets.DOCKER_USER }}/email_agent:latest
-            docker image prune -f 
+            sudo docker pull ${{ secrets.DOCKER_USER }}/email_agent:latest
+            sudo docker image prune -f 
