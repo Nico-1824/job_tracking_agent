@@ -20,5 +20,11 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH }}
           script: |
+            if ! command -v docker &> /dev/null; then
+              sudo apt-get update -y
+              sudo apt-get install -y docker.io
+              sudo systemctl enable --now docker
+              sudo usermod -aG docker $USER
+            fi
             docker pull ${{ secrets.DOCKER_USER }}/email_agent:latest
             docker image prune -f 
