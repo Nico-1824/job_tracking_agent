@@ -1,5 +1,5 @@
 from google import genai
-from tools.gmail_tools import get_message_content, _get_schema
+from tools.gmail_tools import get_message_content, _get_schema, send_mail
 from tools.spreadsheet_tools import get_companies, add_application, update_application, _get_schema_spreadsheet
 import json, os, dotenv
 from functools import partial
@@ -52,7 +52,8 @@ class Agent:
             
                 "Keep working through every distinct company you find across all the emails you scan -- "
                 "call the appropriate tool once per company, and don't stop after just one. Only "
-                "respond with a final summary once there is nothing left to add or update."
+                "respond with a final summary once there is nothing left to add or update and give a short recap of what you were able to add or update"
+                " and if you find mail that you can't add or update such as from La Salle or need to follow up with someone explain the context."
             ),
             input=prompt + f"Tracked applications are: {self.companies}",
             tools=self.tools
@@ -70,7 +71,8 @@ class Agent:
                     function_queue.append(step)
             
             if not function_queue:
-                return interaction.output_text
+                send_mail(interaction.output_text)
+                return "Agent work is done"
             else:
                 for fn in function_queue:
                     fn_call = self.TOOL_REGISTRY.get(fn.name)

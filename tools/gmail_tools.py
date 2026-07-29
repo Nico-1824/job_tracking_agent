@@ -5,13 +5,15 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from email.message import EmailMessage
 import base64
 import datetime
 from bs4 import BeautifulSoup
 import re
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/gmail.readonly",
+          "https://www.googleapis.com/auth/gmail.send"]
 
 def get_gmail_service():
 
@@ -118,6 +120,36 @@ def get_message_content():
         })
     
     return message_content
+
+
+
+
+
+
+def send_mail(message: str):
+    service = get_gmail_service()
+
+    try:
+
+        email_message = EmailMessage()
+        email_message.set_content(message)
+
+        email_message["To"] = "nicolasbriz18@gmail.com"
+        email_message["From"] = "me"
+        email_message["Subject"] = "Automated Summary From Agent"
+
+        encoded_message = base64.urlsafe_b64encode(email_message.as_bytes()).decode()
+        create_message = {"raw": encoded_message}
+
+        send_message = (
+            service.users()
+            .messages()
+            .send(userId="me", body=create_message)
+            .execute()
+        )
+
+    except HttpError as error:
+        print(error)
 
 
 
