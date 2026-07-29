@@ -10,7 +10,7 @@ jobs:
         
       - name: Build and deploy to EC2
         run: |
-          docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+          docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_TOKEN }}
           docker build -t ${{ secrets.DOCKER_USER }}/email_agent:latest .
           docker push ${{ secrets.DOCKER_USER }}/email_agent:latest
       - name: Deploy to EC2
@@ -18,7 +18,7 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          key: ${{ secrets.EC2_SSH }}
           script: |
             docker pull ${{ secrets.DOCKER_USER }}/email_agent:latest
             docker image prune -f 
