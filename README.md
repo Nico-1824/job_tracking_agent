@@ -21,7 +21,7 @@ This agent will read your gmail emails from the last 2 weeks, it'll look for ema
 
 <h2>Future Plans</h2>
 - [x]Integrate Docker to make setup more straightforward<br>
-- Setup email summaries to be sent to a configed email summarizing what was found and what actions were done<br>
+- [x]Setup email summaries to be sent to a configed email summarizing what was found and what actions were done<br>
 - Adding follow-up email recommendations<br>
 - Checking sent emails for extra information<br>
 - Add integrated tests<br>

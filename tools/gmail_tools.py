@@ -18,14 +18,16 @@ dotenv.load_dotenv()
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly",
           "https://www.googleapis.com/auth/gmail.send"]
 
+TOKENS_DIR = os.getenv("TOKEN_DIR")
+
 def get_gmail_service():
 
     """Gets the Gmail service for the authenticated user."""
     creds = None
 
     # token.json stores the user access and auth
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    if os.path.exists(f"{TOKENS_DIR}token.json"):
+        creds = Credentials.from_authorized_user_file(f"{TOKENS_DIR}token.json", SCOPES)
 
 
     # If the creds are not valid, user must log in to get new creds
@@ -34,11 +36,11 @@ def get_gmail_service():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", SCOPES
+                f"{TOKENS_DIR}credentials.json", SCOPES
             )
             creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
-            with open("token.json", "w") as token:
+            with open(f"{TOKENS_DIR}token.json", "w") as token:
                 token.write(creds.to_json())
 
     try:
@@ -70,6 +72,7 @@ def get_unread_messages():
             .execute()
         )
         messages = results.get("messages", [])
+
 
         if not messages:
             print("No new mail.")

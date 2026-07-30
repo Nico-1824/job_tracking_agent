@@ -10,14 +10,14 @@ dotenv.load_dotenv()
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets",]
 
 
-
+TOKENS_DIR = os.getenv("TOKEN_DIR")
 
 def get_spreadsheet_service():
     creds = None
     
     # token.json stores the user access and auth
-    if os.path.exists("token_sheets.json"):
-        creds = Credentials.from_authorized_user_file("token_sheets.json", SCOPES)
+    if os.path.exists(f"{TOKENS_DIR}token_sheets.json"):
+        creds = Credentials.from_authorized_user_file(f"{TOKENS_DIR}token_sheets.json", SCOPES)
 
 
     # If the creds are not valid, user must log in to get new creds
@@ -26,11 +26,11 @@ def get_spreadsheet_service():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", SCOPES
+                f"{TOKENS_DIR}credentials.json", SCOPES
             )
             creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
-            with open("token_sheets.json", "w") as token:
+            with open(f"{TOKENS_DIR}token_sheets.json", "w") as token:
                 token.write(creds.to_json())
 
     try:
