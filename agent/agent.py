@@ -31,69 +31,72 @@ class Agent:
 
         """This is the function to initiate a conversation with the agent and give it its tasks"""
 
-        send_mail("Starting the agentic process")
         print("Starting process...")
 
 
-        interaction = self.client.interactions.create(
-            model="gemini-3.5-flash",
-            system_instruction = (
-                "You are an agent that tracks job applications and what state they are in. "
-                "You will scan emails and determine which ones are actually about job applications, "
-                "as opposed to unrelated emails or general news/announcements from La Salle University "
-                "that are not about a specific application -- ignore emails that don't concern a job "
-                "application's status.\n\n"
-            
-                "For each job-application-related email you find, you will cross reference the tracked companies"
-                " that will be in the input at the start of the conversation. If it is not being added you will use the add_application tool"
-                " to add the application to the spreadsheet for tracking, if it is being tracked you can update the status accordingly with the "
-                "update_application tool."
-            
-                "Only include a recruiter name if the email is a personal message from a specific "
-                "named individual, such as one scheduling an interview or reaching out directly -- "
-                "never from an automated or no-reply sender. Omit the recruiter field otherwise.\n\n"
-            
-                "Keep working through every distinct company you find across all the emails you scan -- "
-                "call the appropriate tool once per company, and don't stop after just one. Only "
-                "respond with a final summary once there is nothing left to add or update and give a short recap of what you were able to add or update"
-                " and if you find mail that you can't add or update such as from La Salle or need to follow up with someone explain the context."
-            ),
-            input=prompt + f"Tracked applications are: {self.companies}",
-            tools=self.tools
-        )
-
-        for turn in range(self.max_turns):
-            print(f"Turn {turn}")
-
-            function_queue = []
-            function_results = []
-            for step in interaction.steps:
-
-                # check if there is functions to be done, if yes run them, if no, theres nothing else to do 
-                # return final response
-                if step.type == "function_call":
-                    function_queue.append(step)
-            
-            if not function_queue:
-                send_mail(interaction.output_text)
-                return "Agent work is done"
-            else:
-                for fn in function_queue:
-                    fn_call = self.TOOL_REGISTRY.get(fn.name)
-                    print(f"Calling function: {fn_call}")
-                    result = fn_call(**fn.arguments)
-                    function_results.append({
-                        "type": "function_result",
-                        "name": fn.name,
-                        "call_id": fn.id,
-                        "result": [{"type": "text", "text": json.dumps(result)}]
-                    })
-            
+        try:
             interaction = self.client.interactions.create(
                 model="gemini-3.5-flash",
-                input=function_results,
-                previous_interaction_id=interaction.id,
+                system_instruction = (
+                    "You are an agent that tracks job applications and what state they are in. "
+                    "You will scan emails and determine which ones are actually about job applications, "
+                    "as opposed to unrelated emails or general news/announcements from La Salle University "
+                    "that are not about a specific application -- ignore emails that don't concern a job "
+                    "application's status.\n\n"
+                
+                    "For each job-application-related email you find, you will cross reference the tracked companies"
+                    " that will be in the input at the start of the conversation. If it is not being added you will use the add_application tool"
+                    " to add the application to the spreadsheet for tracking, if it is being tracked you can update the status accordingly with the "
+                    "update_application tool."
+                
+                    "Only include a recruiter name if the email is a personal message from a specific "
+                    "named individual, such as one scheduling an interview or reaching out directly -- "
+                    "never from an automated or no-reply sender. Omit the recruiter field otherwise.\n\n"
+                
+                    "Keep working through every distinct company you find across all the emails you scan -- "
+                    "call the appropriate tool once per company, and don't stop after just one. Only "
+                    "respond with a final summary once there is nothing left to add or update and give a short recap of what you were able to add or update"
+                    " and if you find mail that you can't add or update such as from La Salle or need to follow up with someone explain the context."
+                ),
+                input=prompt + f"Tracked applications are: {self.companies}",
                 tools=self.tools
             )
 
-        return "Reached max turns, no final result, check for loop"
+            for turn in range(self.max_turns):
+                print(f"Turn {turn}")
+
+                function_queue = []
+                function_results = []
+                for step in interaction.steps:
+
+                    # check if there is functions to be done, if yes run them, if no, theres nothing else to do 
+                    # return final response
+                    if step.type == "function_call":
+                        function_queue.append(step)
+                
+                if not function_queue:
+                    send_mail(interaction.output_text)
+                    return "Agent work is done"
+                else:
+                    for fn in function_queue:
+                        fn_call = self.TOOL_REGISTRY.get(fn.name)
+                        print(f"Calling function: {fn_call}")
+                        result = fn_call(**fn.arguments)
+                        function_results.append({
+                            "type": "function_result",
+                            "name": fn.name,
+                            "call_id": fn.id,
+                            "result": [{"type": "text", "text": json.dumps(result)}]
+                        })
+                
+                interaction = self.client.interactions.create(
+                    model="gemini-3.5-flash",
+                    input=function_results,
+                    previous_interaction_id=interaction.id,
+                    tools=self.tools
+                )
+
+            return "Reached max turns, no final result, check for loop"
+
+        except Exception as error:
+            send_mail(f"An error occured in the agentic loop\n\n{error}", True)

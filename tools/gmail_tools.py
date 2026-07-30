@@ -10,6 +10,9 @@ import base64
 import datetime
 from bs4 import BeautifulSoup
 import re
+import os, dotenv
+
+dotenv.load_dotenv()
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly",
@@ -126,7 +129,7 @@ def get_message_content():
 
 
 
-def send_mail(message: str):
+def send_mail(message: str, error=False):
     service = get_gmail_service()
 
     try:
@@ -134,9 +137,9 @@ def send_mail(message: str):
         email_message = EmailMessage()
         email_message.set_content(message)
 
-        email_message["To"] = "nicolasbriz18@gmail.com"
+        email_message["To"] = os.getenv("REPORT_EMAIL")
         email_message["From"] = "me"
-        email_message["Subject"] = "Automated Summary From Agent"
+        email_message["Subject"] = "Automated Summary From Agent" if error == False else "Error Report"
 
         encoded_message = base64.urlsafe_b64encode(email_message.as_bytes()).decode()
         create_message = {"raw": encoded_message}
