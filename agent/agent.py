@@ -31,6 +31,9 @@ class Agent:
 
         """This is the function to initiate a conversation with the agent and give it its tasks"""
 
+        send_mail("Starting the agentic process")
+        print("Starting process...")
+
 
         interaction = self.client.interactions.create(
             model="gemini-3.5-flash",
@@ -60,6 +63,7 @@ class Agent:
         )
 
         for turn in range(self.max_turns):
+            print(f"Turn {turn}")
 
             function_queue = []
             function_results = []
